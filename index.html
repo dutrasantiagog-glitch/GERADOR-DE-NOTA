@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema Profissional de Notas</title>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 body{
     margin:0;
@@ -15,7 +17,7 @@ body{
 header{
     background:#0d47a1;
     color:white;
-    padding:15px;
+    padding:20px;
     text-align:center;
     font-size:22px;
 }
@@ -41,17 +43,27 @@ nav button:hover{
 
 .section{
     display:none;
-    padding:20px;
+    padding:25px;
 }
 
 .active{
     display:block;
 }
 
+.card{
+    background:white;
+    padding:12px;
+    margin-bottom:8px;
+    border-radius:6px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
 input, select{
     width:100%;
     padding:10px;
     margin-bottom:10px;
+    border-radius:6px;
+    border:1px solid #ccc;
 }
 
 button.primary{
@@ -60,6 +72,7 @@ button.primary{
     border:none;
     padding:10px;
     cursor:pointer;
+    border-radius:6px;
 }
 
 button.danger{
@@ -68,32 +81,61 @@ button.danger{
     border:none;
     padding:10px;
     cursor:pointer;
-}
-
-.card{
-    background:white;
-    padding:15px;
-    margin-bottom:10px;
     border-radius:6px;
 }
 
-#nota{
-    background:white;
-    padding:20px;
+#notaGerada{
     margin-top:20px;
-    border:2px solid #1565c0;
+    background:white;
+    padding:25px;
+    border-radius:8px;
+    border:3px solid #1565c0;
 }
 
-.valor{
-    font-size:20px;
+.nota-topo{
+    display:flex;
+    justify-content:space-between;
+    border-bottom:2px solid #c62828;
+    padding-bottom:10px;
+    margin-bottom:20px;
+}
+
+.nota-bloco{
+    margin-bottom:15px;
+    padding:10px;
+    background:#f5f8ff;
+    border-left:4px solid #1565c0;
+}
+
+.tabela{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+.tabela th, .tabela td{
+    border:1px solid #ccc;
+    padding:8px;
+    text-align:center;
+}
+
+.tabela th{
+    background:#1565c0;
+    color:white;
+}
+
+.total{
+    text-align:right;
+    font-size:18px;
     font-weight:bold;
     color:#c62828;
+    margin-top:15px;
 }
 
 @media print{
     body *{ visibility:hidden; }
-    #nota, #nota *{ visibility:visible; }
-    #nota{
+    #notaGerada, #notaGerada *{ visibility:visible; }
+    #notaGerada{
         position:absolute;
         left:0;
         top:0;
@@ -105,22 +147,15 @@ button.danger{
 
 <body>
 
-<header>Sistema Profissional de Notas</header>
+<header><i class="fa-solid fa-file-invoice"></i> Sistema Profissional de Notas</header>
 
 <nav>
-<button onclick="mostrar('dashboard')">Dashboard</button>
-<button onclick="mostrar('clientes')">Clientes</button>
-<button onclick="mostrar('produtos')">Produtos</button>
-<button onclick="mostrar('nota')">Nova Nota</button>
+<button onclick="mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
+<button onclick="mostrar('produtos')"><i class="fa-solid fa-box"></i> Produtos</button>
+<button onclick="mostrar('nota')"><i class="fa-solid fa-receipt"></i> Nova Nota</button>
 </nav>
 
-<div id="dashboard" class="section active">
-<h2>Resumo</h2>
-<p>Total de Clientes: <span id="totalClientes">0</span></p>
-<p>Total de Produtos: <span id="totalProdutos">0</span></p>
-</div>
-
-<div id="clientes" class="section">
+<div id="clientes" class="section active">
 <h2>Cadastrar Cliente</h2>
 <input type="text" id="nomeCliente" placeholder="Nome do cliente">
 <input type="text" id="docCliente" placeholder="CPF ou CNPJ">
@@ -129,7 +164,7 @@ button.danger{
 </div>
 
 <div id="produtos" class="section">
-<h2>Cadastrar Produto</h2>
+<h2>Cadastrar Produto ou Serviço</h2>
 <input type="text" id="nomeProduto" placeholder="Nome do produto ou serviço">
 <input type="number" id="precoProduto" placeholder="Preço">
 <button class="primary" onclick="addProduto()">Salvar Produto</button>
@@ -141,6 +176,7 @@ button.danger{
 
 <select id="selectCliente"></select>
 <select id="selectProduto"></select>
+<input type="number" id="quantidade" placeholder="Quantidade" value="1">
 
 <button class="primary" onclick="gerarNota()">Gerar Nota</button>
 <button class="danger" onclick="window.print()">Imprimir / Salvar PDF</button>
@@ -149,7 +185,6 @@ button.danger{
 </div>
 
 <script>
-
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
 let numeroNota = 1;
@@ -157,7 +192,6 @@ let numeroNota = 1;
 function salvar(){
     localStorage.setItem("clientes", JSON.stringify(clientes));
     localStorage.setItem("produtos", JSON.stringify(produtos));
-    atualizarDashboard();
     renderizar();
 }
 
@@ -167,52 +201,78 @@ function mostrar(id){
 }
 
 function addCliente(){
+    const codigo = "C" + (clientes.length + 1);
     const nome = document.getElementById("nomeCliente").value;
     const doc = document.getElementById("docCliente").value;
     if(!nome) return;
-    clientes.push({nome, doc});
+    clientes.push({codigo, nome, doc});
     salvar();
 }
 
 function addProduto(){
+    const codigo = "P" + (produtos.length + 1);
     const nome = document.getElementById("nomeProduto").value;
-    const preco = document.getElementById("precoProduto").value;
+    const preco = parseFloat(document.getElementById("precoProduto").value);
     if(!nome || !preco) return;
-    produtos.push({nome, preco});
+    produtos.push({codigo, nome, preco});
     salvar();
 }
 
 function renderizar(){
-    document.getElementById("listaClientes").innerHTML = clientes.map(c=>`<div class="card">${c.nome}</div>`).join("");
-    document.getElementById("listaProdutos").innerHTML = produtos.map(p=>`<div class="card">${p.nome} - R$ ${p.preco}</div>`).join("");
+    document.getElementById("listaClientes").innerHTML =
+        clientes.map(c=>`<div class="card">Código: ${c.codigo} | ${c.nome}</div>`).join("");
 
-    document.getElementById("selectCliente").innerHTML = clientes.map((c,i)=>`<option value="${i}">${c.nome}</option>`).join("");
-    document.getElementById("selectProduto").innerHTML = produtos.map((p,i)=>`<option value="${i}">${p.nome}</option>`).join("");
-}
+    document.getElementById("listaProdutos").innerHTML =
+        produtos.map(p=>`<div class="card">Código: ${p.codigo} | ${p.nome} - R$ ${p.preco}</div>`).join("");
 
-function atualizarDashboard(){
-    document.getElementById("totalClientes").innerText = clientes.length;
-    document.getElementById("totalProdutos").innerText = produtos.length;
+    document.getElementById("selectCliente").innerHTML =
+        clientes.map((c,i)=>`<option value="${i}">${c.codigo} - ${c.nome}</option>`).join("");
+
+    document.getElementById("selectProduto").innerHTML =
+        produtos.map((p,i)=>`<option value="${i}">${p.codigo} - ${p.nome}</option>`).join("");
 }
 
 function gerarNota(){
-    const clienteIndex = document.getElementById("selectCliente").value;
-    const produtoIndex = document.getElementById("selectProduto").value;
-
-    if(clienteIndex === "" || produtoIndex === "") return;
-
-    const cliente = clientes[clienteIndex];
-    const produto = produtos[produtoIndex];
+    const cliente = clientes[document.getElementById("selectCliente").value];
+    const produto = produtos[document.getElementById("selectProduto").value];
+    const quantidade = parseInt(document.getElementById("quantidade").value);
     const data = new Date().toLocaleDateString();
 
+    const total = produto.preco * quantidade;
+
     const html = `
-    <h3>Nota de Serviço</h3>
-    <p><strong>Número:</strong> ${numeroNota}</p>
-    <p><strong>Data:</strong> ${data}</p>
-    <p><strong>Cliente:</strong> ${cliente.nome}</p>
-    <p><strong>CPF/CNPJ:</strong> ${cliente.doc}</p>
-    <p><strong>Serviço:</strong> ${produto.nome}</p>
-    <p class="valor">Valor: R$ ${produto.preco}</p>
+    <div class="nota-topo">
+        <div>
+            <h2>Nota de Serviço</h2>
+            <p>Número: ${numeroNota}</p>
+            <p>Data: ${data}</p>
+        </div>
+        <div>
+            <p><strong>Cliente:</strong> ${cliente.nome}</p>
+            <p><strong>Código:</strong> ${cliente.codigo}</p>
+            <p><strong>Documento:</strong> ${cliente.doc}</p>
+        </div>
+    </div>
+
+    <div class="nota-bloco">
+        <table class="tabela">
+            <tr>
+                <th>Código</th>
+                <th>Descrição</th>
+                <th>Quantidade</th>
+                <th>Valor Unitário</th>
+                <th>Total</th>
+            </tr>
+            <tr>
+                <td>${produto.codigo}</td>
+                <td>${produto.nome}</td>
+                <td>${quantidade}</td>
+                <td>R$ ${produto.preco}</td>
+                <td>R$ ${total}</td>
+            </tr>
+        </table>
+        <div class="total">Valor Total: R$ ${total}</div>
+    </div>
     `;
 
     document.getElementById("notaGerada").innerHTML = html;
@@ -220,8 +280,6 @@ function gerarNota(){
 }
 
 renderizar();
-atualizarDashboard();
-
 </script>
 
 </body>
