@@ -8,157 +8,149 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#eef3ff;
-}
+body{margin:0;font-family:Arial;background:#eef3ff;}
 
 header{
-    background:#0d47a1;
-    color:white;
-    padding:20px;
-    text-align:center;
-    font-size:22px;
+background:#0d47a1;
+color:white;
+padding:20px;
+text-align:center;
+font-size:22px;
 }
 
-nav{
-    display:flex;
-    background:#1565c0;
-}
+nav{display:flex;background:#1565c0;}
 
 nav button{
-    flex:1;
-    padding:15px;
-    border:none;
-    background:#1565c0;
-    color:white;
-    cursor:pointer;
-    font-weight:bold;
+flex:1;
+padding:15px;
+border:none;
+background:#1565c0;
+color:white;
+cursor:pointer;
+font-weight:bold;
 }
 
-nav button:hover{
-    background:#0d47a1;
-}
+nav button:hover{background:#0d47a1;}
 
-.section{
-    display:none;
-    padding:25px;
-}
-
-.active{
-    display:block;
-}
+.section{display:none;padding:25px;}
+.active{display:block;}
 
 .card{
-    background:white;
-    padding:12px;
-    margin-bottom:8px;
-    border-radius:6px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+background:white;
+padding:12px;
+margin-bottom:8px;
+border-radius:6px;
+box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
-input, select{
-    width:100%;
-    padding:10px;
-    margin-bottom:10px;
-    border-radius:6px;
-    border:1px solid #ccc;
+input,select{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:6px;
+border:1px solid #ccc;
 }
 
 button.primary{
-    background:#1565c0;
-    color:white;
-    border:none;
-    padding:10px;
-    cursor:pointer;
-    border-radius:6px;
+background:#1565c0;
+color:white;
+border:none;
+padding:10px;
+cursor:pointer;
+border-radius:6px;
 }
 
 button.danger{
-    background:#c62828;
-    color:white;
-    border:none;
-    padding:10px;
-    cursor:pointer;
-    border-radius:6px;
+background:#c62828;
+color:white;
+border:none;
+padding:10px;
+cursor:pointer;
+border-radius:6px;
 }
 
 #notaGerada{
-    margin-top:20px;
-    background:white;
-    padding:25px;
-    border-radius:8px;
-    border:3px solid #1565c0;
+margin-top:20px;
+background:white;
+padding:25px;
+border-radius:8px;
+border:3px solid #1565c0;
 }
 
 .nota-topo{
-    display:flex;
-    justify-content:space-between;
-    border-bottom:2px solid #c62828;
-    padding-bottom:10px;
-    margin-bottom:20px;
+display:flex;
+justify-content:space-between;
+border-bottom:2px solid #c62828;
+padding-bottom:10px;
+margin-bottom:20px;
 }
 
-.nota-bloco{
-    margin-bottom:15px;
-    padding:10px;
-    background:#f5f8ff;
-    border-left:4px solid #1565c0;
+.logo{
+max-height:80px;
 }
 
 .tabela{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:10px;
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
 }
 
-.tabela th, .tabela td{
-    border:1px solid #ccc;
-    padding:8px;
-    text-align:center;
+.tabela th,.tabela td{
+border:1px solid #ccc;
+padding:8px;
+text-align:center;
 }
 
 .tabela th{
-    background:#1565c0;
-    color:white;
+background:#1565c0;
+color:white;
 }
 
 .total{
-    text-align:right;
-    font-size:18px;
-    font-weight:bold;
-    color:#c62828;
-    margin-top:15px;
+text-align:right;
+font-size:18px;
+font-weight:bold;
+color:#c62828;
+margin-top:15px;
 }
 
 @media print{
-    body *{ visibility:hidden; }
-    #notaGerada, #notaGerada *{ visibility:visible; }
-    #notaGerada{
-        position:absolute;
-        left:0;
-        top:0;
-        width:100%;
-    }
+body *{visibility:hidden;}
+#notaGerada,#notaGerada *{visibility:visible;}
+#notaGerada{
+position:absolute;
+left:0;
+top:0;
+width:100%;
+}
 }
 </style>
 </head>
 
 <body>
 
-<header><i class="fa-solid fa-file-invoice"></i> Sistema Profissional de Notas</header>
+<header>Sistema Profissional de Notas</header>
 
 <nav>
-<button onclick="mostrar('clientes')"><i class="fa-solid fa-users"></i> Clientes</button>
-<button onclick="mostrar('produtos')"><i class="fa-solid fa-box"></i> Produtos</button>
-<button onclick="mostrar('nota')"><i class="fa-solid fa-receipt"></i> Nova Nota</button>
+<button onclick="mostrar('perfil')">Perfil</button>
+<button onclick="mostrar('clientes')">Clientes</button>
+<button onclick="mostrar('produtos')">Produtos</button>
+<button onclick="mostrar('nota')">Nova Nota</button>
 </nav>
 
-<div id="clientes" class="section active">
+<div id="perfil" class="section active">
+<h2>Perfil da Empresa</h2>
+<input type="text" id="nomeEmpresa" placeholder="Nome da empresa">
+<input type="text" id="cnpjEmpresa" placeholder="CNPJ">
+<input type="text" id="enderecoEmpresa" placeholder="Endereço">
+<input type="file" id="logoInput">
+<button class="primary" onclick="salvarPerfil()">Salvar Perfil</button>
+</div>
+
+<div id="clientes" class="section">
 <h2>Cadastrar Cliente</h2>
 <input type="text" id="nomeCliente" placeholder="Nome do cliente">
-<input type="text" id="docCliente" placeholder="CPF ou CNPJ">
+<input type="text" id="cnpjCliente" placeholder="CNPJ do cliente">
 <button class="primary" onclick="addCliente()">Salvar Cliente</button>
 <div id="listaClientes"></div>
 </div>
@@ -185,98 +177,125 @@ button.danger{
 </div>
 
 <script>
+let perfil = JSON.parse(localStorage.getItem("perfil")) || {};
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
 let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
-let numeroNota = 1;
-
-function salvar(){
-    localStorage.setItem("clientes", JSON.stringify(clientes));
-    localStorage.setItem("produtos", JSON.stringify(produtos));
-    renderizar();
-}
+let numeroNota = localStorage.getItem("numeroNota") || 1;
+let seqCliente = localStorage.getItem("seqCliente") || 1;
+let seqProduto = localStorage.getItem("seqProduto") || 1;
 
 function mostrar(id){
-    document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
+document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+
+function salvarPerfil(){
+const reader = new FileReader();
+const file = document.getElementById("logoInput").files[0];
+
+if(file){
+reader.onload=function(e){
+perfil.logo = e.target.result;
+salvarPerfilDados();
+};
+reader.readAsDataURL(file);
+}else{
+salvarPerfilDados();
+}
+}
+
+function salvarPerfilDados(){
+perfil.nome = document.getElementById("nomeEmpresa").value;
+perfil.cnpj = document.getElementById("cnpjEmpresa").value;
+perfil.endereco = document.getElementById("enderecoEmpresa").value;
+localStorage.setItem("perfil",JSON.stringify(perfil));
 }
 
 function addCliente(){
-    const codigo = "C" + (clientes.length + 1);
-    const nome = document.getElementById("nomeCliente").value;
-    const doc = document.getElementById("docCliente").value;
-    if(!nome) return;
-    clientes.push({codigo, nome, doc});
-    salvar();
+const codigo = "C"+seqCliente++;
+const nome = document.getElementById("nomeCliente").value;
+const cnpj = document.getElementById("cnpjCliente").value;
+if(!nome) return;
+clientes.push({codigo,nome,cnpj});
+localStorage.setItem("seqCliente",seqCliente);
+localStorage.setItem("clientes",JSON.stringify(clientes));
+renderizar();
 }
 
 function addProduto(){
-    const codigo = "P" + (produtos.length + 1);
-    const nome = document.getElementById("nomeProduto").value;
-    const preco = parseFloat(document.getElementById("precoProduto").value);
-    if(!nome || !preco) return;
-    produtos.push({codigo, nome, preco});
-    salvar();
+const codigo = "P"+seqProduto++;
+const nome = document.getElementById("nomeProduto").value;
+const preco = parseFloat(document.getElementById("precoProduto").value);
+if(!nome || !preco) return;
+produtos.push({codigo,nome,preco});
+localStorage.setItem("seqProduto",seqProduto);
+localStorage.setItem("produtos",JSON.stringify(produtos));
+renderizar();
 }
 
 function renderizar(){
-    document.getElementById("listaClientes").innerHTML =
-        clientes.map(c=>`<div class="card">Código: ${c.codigo} | ${c.nome}</div>`).join("");
+document.getElementById("listaClientes").innerHTML =
+clientes.map(c=>`<div class="card">${c.codigo} - ${c.nome}</div>`).join("");
 
-    document.getElementById("listaProdutos").innerHTML =
-        produtos.map(p=>`<div class="card">Código: ${p.codigo} | ${p.nome} - R$ ${p.preco}</div>`).join("");
+document.getElementById("listaProdutos").innerHTML =
+produtos.map(p=>`<div class="card">${p.codigo} - ${p.nome} - R$ ${p.preco}</div>`).join("");
 
-    document.getElementById("selectCliente").innerHTML =
-        clientes.map((c,i)=>`<option value="${i}">${c.codigo} - ${c.nome}</option>`).join("");
+document.getElementById("selectCliente").innerHTML =
+clientes.map((c,i)=>`<option value="${i}">${c.codigo} - ${c.nome}</option>`).join("");
 
-    document.getElementById("selectProduto").innerHTML =
-        produtos.map((p,i)=>`<option value="${i}">${p.codigo} - ${p.nome}</option>`).join("");
+document.getElementById("selectProduto").innerHTML =
+produtos.map((p,i)=>`<option value="${i}">${p.codigo} - ${p.nome}</option>`).join("");
 }
 
 function gerarNota(){
-    const cliente = clientes[document.getElementById("selectCliente").value];
-    const produto = produtos[document.getElementById("selectProduto").value];
-    const quantidade = parseInt(document.getElementById("quantidade").value);
-    const data = new Date().toLocaleDateString();
+const cliente = clientes[document.getElementById("selectCliente").value];
+const produto = produtos[document.getElementById("selectProduto").value];
+const quantidade = parseInt(document.getElementById("quantidade").value);
+const data = new Date().toLocaleDateString();
+const total = produto.preco * quantidade;
 
-    const total = produto.preco * quantidade;
+const html = `
+<div class="nota-topo">
+<div>
+${perfil.logo ? `<img src="${perfil.logo}" class="logo">` : ""}
+<h2>${perfil.nome || ""}</h2>
+<p>CNPJ: ${perfil.cnpj || ""}</p>
+<p>${perfil.endereco || ""}</p>
+</div>
+<div>
+<h3>Nota de Serviço</h3>
+<p>Número: ${numeroNota}</p>
+<p>Data: ${data}</p>
+</div>
+</div>
 
-    const html = `
-    <div class="nota-topo">
-        <div>
-            <h2>Nota de Serviço</h2>
-            <p>Número: ${numeroNota}</p>
-            <p>Data: ${data}</p>
-        </div>
-        <div>
-            <p><strong>Cliente:</strong> ${cliente.nome}</p>
-            <p><strong>Código:</strong> ${cliente.codigo}</p>
-            <p><strong>Documento:</strong> ${cliente.doc}</p>
-        </div>
-    </div>
+<p><strong>Cliente:</strong> ${cliente.nome}</p>
+<p><strong>CNPJ:</strong> ${cliente.cnpj}</p>
 
-    <div class="nota-bloco">
-        <table class="tabela">
-            <tr>
-                <th>Código</th>
-                <th>Descrição</th>
-                <th>Quantidade</th>
-                <th>Valor Unitário</th>
-                <th>Total</th>
-            </tr>
-            <tr>
-                <td>${produto.codigo}</td>
-                <td>${produto.nome}</td>
-                <td>${quantidade}</td>
-                <td>R$ ${produto.preco}</td>
-                <td>R$ ${total}</td>
-            </tr>
-        </table>
-        <div class="total">Valor Total: R$ ${total}</div>
-    </div>
-    `;
+<table class="tabela">
+<tr>
+<th>Código</th>
+<th>Descrição</th>
+<th>Quantidade</th>
+<th>Valor Unitário</th>
+<th>Total</th>
+</tr>
+<tr>
+<td>${produto.codigo}</td>
+<td>${produto.nome}</td>
+<td>${quantidade}</td>
+<td>R$ ${produto.preco}</td>
+<td>R$ ${total}</td>
+</tr>
+</table>
 
-    document.getElementById("notaGerada").innerHTML = html;
-    numeroNota++;
+<div class="total">Valor Total: R$ ${total}</div>
+`;
+
+document.getElementById("notaGerada").innerHTML = html;
+
+numeroNota++;
+localStorage.setItem("numeroNota",numeroNota);
 }
 
 renderizar();
