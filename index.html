@@ -1,305 +1,1333 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Profissional de Notas</title>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Notas e Serviços</title>
+    <style>
+      :root {
+        --bg: #f3f6fb;
+        --panel: #ffffff;
+        --panel-soft: #eef4ff;
+        --primary: #123d7a;
+        --primary-strong: #0b2d5d;
+        --secondary: #dfeafc;
+        --accent: #e9c46a;
+        --success: #1f8f5f;
+        --danger: #d15353;
+        --text: #1d2433;
+        --muted: #5b6475;
+        --line: #dfe5ef;
+        --shadow: 0 8px 22px rgba(13, 28, 53, 0.10);
+      }
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      * { box-sizing: border-box; }
 
-<style>
-body{margin:0;font-family:Arial;background:#eef3ff;}
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
 
-header{
-background:#0d47a1;
-color:white;
-padding:20px;
-text-align:center;
-font-size:22px;
-}
+      body {
+        min-height: 100vh;
+      }
 
-nav{display:flex;background:#1565c0;}
+      button, input, select, textarea {
+        font: inherit;
+      }
 
-nav button{
-flex:1;
-padding:15px;
-border:none;
-background:#1565c0;
-color:white;
-cursor:pointer;
-font-weight:bold;
-}
+      .app-shell {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 100vh;
+      }
 
-nav button:hover{background:#0d47a1;}
+      .sidebar {
+        background: linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
+        color: white;
+        padding: 28px 18px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
 
-.section{display:none;padding:25px;}
-.active{display:block;}
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+        padding: 10px 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.25);
+      }
 
-.card{
-background:white;
-padding:12px;
-margin-bottom:8px;
-border-radius:6px;
-box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        background: rgba(255,255,255,0.16);
+        font-weight: 700;
+        font-size: 1.2rem;
+      }
 
-input,select{
-width:100%;
-padding:10px;
-margin-bottom:10px;
-border-radius:6px;
-border:1px solid #ccc;
-}
+      .brand h1 {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
 
-button.primary{
-background:#1565c0;
-color:white;
-border:none;
-padding:10px;
-cursor:pointer;
-border-radius:6px;
-}
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-button.danger{
-background:#c62828;
-color:white;
-border:none;
-padding:10px;
-cursor:pointer;
-border-radius:6px;
-}
+      .nav button {
+        width: 100%;
+        border: 0;
+        background: rgba(255,255,255,0.08);
+        color: white;
+        border-radius: 12px;
+        padding: 12px 14px;
+        text-align: left;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.2s ease;
+      }
 
-#notaGerada{
-margin-top:20px;
-background:white;
-padding:25px;
-border-radius:8px;
-border:3px solid #1565c0;
-}
+      .nav button:hover,
+      .nav button.active {
+        background: rgba(255,255,255,0.18);
+      }
 
-.nota-topo{
-display:flex;
-justify-content:space-between;
-border-bottom:2px solid #c62828;
-padding-bottom:10px;
-margin-bottom:20px;
-}
+      .main {
+        padding: 28px;
+      }
 
-.logo{
-max-height:80px;
-}
+      .section {
+        display: none;
+      }
 
-.tabela{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-}
+      .section.active {
+        display: block;
+      }
 
-.tabela th,.tabela td{
-border:1px solid #ccc;
-padding:8px;
-text-align:center;
-}
+      .header-card {
+        background: linear-gradient(135deg, #ffffff 0%, #edf5ff 100%);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        padding: 24px 26px;
+        margin-bottom: 22px;
+      }
 
-.tabela th{
-background:#1565c0;
-color:white;
-}
+      .header-card h2 {
+        margin: 0 0 6px;
+        font-size: clamp(1.5rem, 2vw, 2rem);
+      }
 
-.total{
-text-align:right;
-font-size:18px;
-font-weight:bold;
-color:#c62828;
-margin-top:15px;
-}
+      .header-card p {
+        margin: 0;
+        color: var(--muted);
+      }
 
-@media print{
-body *{visibility:hidden;}
-#notaGerada,#notaGerada *{visibility:visible;}
-#notaGerada{
-position:absolute;
-left:0;
-top:0;
-width:100%;
-}
-}
-</style>
-</head>
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
 
-<body>
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
 
-<header>Sistema Profissional de Notas</header>
+      .card h3 {
+        margin-top: 0;
+        margin-bottom: 18px;
+        font-size: 1.2rem;
+      }
 
-<nav>
-<button onclick="mostrar('perfil')">Perfil</button>
-<button onclick="mostrar('clientes')">Clientes</button>
-<button onclick="mostrar('produtos')">Produtos</button>
-<button onclick="mostrar('nota')">Nova Nota</button>
-</nav>
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
 
-<div id="perfil" class="section active">
-<h2>Perfil da Empresa</h2>
-<input type="text" id="nomeEmpresa" placeholder="Nome da empresa">
-<input type="text" id="cnpjEmpresa" placeholder="CNPJ">
-<input type="text" id="enderecoEmpresa" placeholder="Endereço">
-<input type="file" id="logoInput">
-<button class="primary" onclick="salvarPerfil()">Salvar Perfil</button>
-</div>
+      .form-grid .full {
+        grid-column: 1 / -1;
+      }
 
-<div id="clientes" class="section">
-<h2>Cadastrar Cliente</h2>
-<input type="text" id="nomeCliente" placeholder="Nome do cliente">
-<input type="text" id="cnpjCliente" placeholder="CNPJ do cliente">
-<button class="primary" onclick="addCliente()">Salvar Cliente</button>
-<div id="listaClientes"></div>
-</div>
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        font-size: 0.82rem;
+        color: var(--muted);
+        font-weight: 700;
+      }
 
-<div id="produtos" class="section">
-<h2>Cadastrar Produto ou Serviço</h2>
-<input type="text" id="nomeProduto" placeholder="Nome do produto ou serviço">
-<input type="number" id="precoProduto" placeholder="Preço">
-<button class="primary" onclick="addProduto()">Salvar Produto</button>
-<div id="listaProdutos"></div>
-</div>
+      input, select, textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 11px 12px;
+        background: white;
+        color: var(--text);
+      }
 
-<div id="nota" class="section">
-<h2>Gerar Nota</h2>
+      input:focus, select:focus, textarea:focus {
+        outline: 2px solid rgba(18, 61, 122, 0.15);
+        border-color: var(--primary);
+      }
 
-<select id="selectCliente"></select>
-<select id="selectProduto"></select>
-<input type="number" id="quantidade" placeholder="Quantidade" value="1">
+      textarea {
+        min-height: 85px;
+        resize: vertical;
+      }
 
-<button class="primary" onclick="gerarNota()">Gerar Nota</button>
-<button class="danger" onclick="window.print()">Imprimir / Salvar PDF</button>
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 18px;
+      }
 
-<div id="notaGerada"></div>
-</div>
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
 
-<script>
-let perfil = JSON.parse(localStorage.getItem("perfil")) || {};
-let clientes = JSON.parse(localStorage.getItem("clientes")) || [];
-let produtos = JSON.parse(localStorage.getItem("produtos")) || [];
-let numeroNota = localStorage.getItem("numeroNota") || 1;
-let seqCliente = localStorage.getItem("seqCliente") || 1;
-let seqProduto = localStorage.getItem("seqProduto") || 1;
+      .btn.primary {
+        background: var(--primary);
+        color: white;
+      }
 
-function mostrar(id){
-document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-}
+      .btn.primary:hover { background: var(--primary-strong); }
 
-function salvarPerfil(){
-const reader = new FileReader();
-const file = document.getElementById("logoInput").files[0];
+      .btn.secondary {
+        background: var(--secondary);
+        color: var(--primary-strong);
+      }
 
-if(file){
-reader.onload=function(e){
-perfil.logo = e.target.result;
-salvarPerfilDados();
-};
-reader.readAsDataURL(file);
-}else{
-salvarPerfilDados();
-}
-}
+      .btn.danger {
+        background: var(--danger);
+        color: white;
+      }
 
-function salvarPerfilDados(){
-perfil.nome = document.getElementById("nomeEmpresa").value;
-perfil.cnpj = document.getElementById("cnpjEmpresa").value;
-perfil.endereco = document.getElementById("enderecoEmpresa").value;
-localStorage.setItem("perfil",JSON.stringify(perfil));
-}
+      .list-box {
+        display: grid;
+        gap: 10px;
+        margin-top: 16px;
+      }
 
-function addCliente(){
-const codigo = "C"+seqCliente++;
-const nome = document.getElementById("nomeCliente").value;
-const cnpj = document.getElementById("cnpjCliente").value;
-if(!nome) return;
-clientes.push({codigo,nome,cnpj});
-localStorage.setItem("seqCliente",seqCliente);
-localStorage.setItem("clientes",JSON.stringify(clientes));
-renderizar();
-}
+      .list-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #f9fbff;
+      }
 
-function addProduto(){
-const codigo = "P"+seqProduto++;
-const nome = document.getElementById("nomeProduto").value;
-const preco = parseFloat(document.getElementById("precoProduto").value);
-if(!nome || !preco) return;
-produtos.push({codigo,nome,preco});
-localStorage.setItem("seqProduto",seqProduto);
-localStorage.setItem("produtos",JSON.stringify(produtos));
-renderizar();
-}
+      .list-item strong {
+        display: block;
+        margin-bottom: 2px;
+      }
 
-function renderizar(){
-document.getElementById("listaClientes").innerHTML =
-clientes.map(c=>`<div class="card">${c.codigo} - ${c.nome}</div>`).join("");
+      .list-item small {
+        color: var(--muted);
+      }
 
-document.getElementById("listaProdutos").innerHTML =
-produtos.map(p=>`<div class="card">${p.codigo} - ${p.nome} - R$ ${p.preco}</div>`).join("");
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 76px;
+        border-radius: 999px;
+        background: var(--secondary);
+        color: var(--primary-strong);
+        font-weight: 700;
+        padding: 5px 10px;
+        font-size: 0.72rem;
+      }
 
-document.getElementById("selectCliente").innerHTML =
-clientes.map((c,i)=>`<option value="${i}">${c.codigo} - ${c.nome}</option>`).join("");
+      .table-wrap {
+        overflow-x: auto;
+      }
 
-document.getElementById("selectProduto").innerHTML =
-produtos.map((p,i)=>`<option value="${i}">${p.codigo} - ${p.nome}</option>`).join("");
-}
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 14px;
+      }
 
-function gerarNota(){
-const cliente = clientes[document.getElementById("selectCliente").value];
-const produto = produtos[document.getElementById("selectProduto").value];
-const quantidade = parseInt(document.getElementById("quantidade").value);
-const data = new Date().toLocaleDateString();
-const total = produto.preco * quantidade;
+      th, td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: middle;
+      }
 
-const html = `
-<div class="nota-topo">
-<div>
-${perfil.logo ? `<img src="${perfil.logo}" class="logo">` : ""}
-<h2>${perfil.nome || ""}</h2>
-<p>CNPJ: ${perfil.cnpj || ""}</p>
-<p>${perfil.endereco || ""}</p>
-</div>
-<div>
-<h3>Nota de Serviço</h3>
-<p>Número: ${numeroNota}</p>
-<p>Data: ${data}</p>
-</div>
-</div>
+      th {
+        background: #f2f7ff;
+        color: var(--primary-strong);
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
 
-<p><strong>Cliente:</strong> ${cliente.nome}</p>
-<p><strong>CNPJ:</strong> ${cliente.cnpj}</p>
+      .tiny-btn {
+        border: 0;
+        border-radius: 8px;
+        padding: 7px 10px;
+        cursor: pointer;
+        font-weight: 700;
+      }
 
-<table class="tabela">
-<tr>
-<th>Código</th>
-<th>Descrição</th>
-<th>Quantidade</th>
-<th>Valor Unitário</th>
-<th>Total</th>
-</tr>
-<tr>
-<td>${produto.codigo}</td>
-<td>${produto.nome}</td>
-<td>${quantidade}</td>
-<td>R$ ${produto.preco}</td>
-<td>R$ ${total}</td>
-</tr>
-</table>
+      .tiny-btn.remove {
+        background: rgba(209, 83, 83, 0.12);
+        color: var(--danger);
+      }
 
-<div class="total">Valor Total: R$ ${total}</div>
-`;
+      .tiny-btn.edit {
+        background: rgba(18, 61, 122, 0.12);
+        color: var(--primary);
+      }
 
-document.getElementById("notaGerada").innerHTML = html;
+      .invoice-builder {
+        display: grid;
+        gap: 18px;
+      }
 
-numeroNota++;
-localStorage.setItem("numeroNota",numeroNota);
-}
+      .invoice-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: end;
+      }
 
-renderizar();
-</script>
+      .invoice-toolbar > * {
+        flex: 1 1 180px;
+      }
 
-</body>
+      .item-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr auto;
+        gap: 10px;
+        align-items: end;
+        margin-top: 12px;
+      }
+
+      .invoice-total {
+        width: min(320px, 100%);
+        margin-left: auto;
+        background: #f5f8ff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px 16px;
+      }
+
+      .total-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 7px 0;
+      }
+
+      .total-line strong {
+        font-size: 1.15rem;
+      }
+
+      .invoice-preview {
+        border: 1px solid var(--line);
+        background: white;
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        padding: 28px;
+      }
+
+      .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        padding-bottom: 18px;
+        border-bottom: 2px solid var(--primary);
+      }
+
+      .company-block {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+      }
+
+      .company-logo {
+        width: 88px;
+        height: 88px;
+        object-fit: cover;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #f4f7ff;
+      }
+
+      .company-block h2 {
+        margin: 0 0 6px;
+        font-size: clamp(1.3rem, 2vw, 1.8rem);
+      }
+
+      .company-block p,
+      .invoice-meta p,
+      .invoice-details p,
+      .invoice-footer p {
+        margin: 5px 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .invoice-meta {
+        text-align: right;
+      }
+
+      .invoice-meta h3 {
+        margin: 0 0 8px;
+        font-size: 1.3rem;
+      }
+
+      .invoice-body {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 20px;
+        padding: 18px 0 12px;
+      }
+
+      .invoice-box {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fafcff;
+        padding: 12px 14px;
+      }
+
+      .invoice-box h4 {
+        margin: 0 0 8px;
+        color: var(--primary-strong);
+      }
+
+      .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .invoice-table th,
+      .invoice-table td {
+        border: 1px solid var(--line);
+        padding: 10px 8px;
+        text-align: left;
+      }
+
+      .invoice-table th {
+        background: var(--primary);
+        color: white;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .invoice-table td.amount,
+      .invoice-table th.amount {
+        text-align: right;
+      }
+
+      .invoice-summary {
+        border-top: 2px solid var(--primary);
+        margin-top: 16px;
+        padding-top: 12px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .summary-card {
+        width: min(340px, 100%);
+        background: #f6f9ff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+
+      .invoice-footer {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 12px;
+      }
+
+      .empty-state {
+        color: var(--muted);
+        padding: 18px 12px;
+        border: 1px dashed var(--line);
+        border-radius: 10px;
+        background: #fafcff;
+        text-align: center;
+      }
+
+      .hide-mobile {
+        display: initial;
+      }
+
+      @media (max-width: 980px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: relative;
+          height: auto;
+        }
+
+        .grid-2,
+        .form-grid,
+        .invoice-body {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .main {
+          padding: 18px;
+        }
+
+        .invoice-header {
+          flex-direction: column;
+        }
+
+        .invoice-meta {
+          text-align: left;
+        }
+
+        .invoice-table {
+          font-size: 0.8rem;
+        }
+
+        .item-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        .sidebar,
+        .main > *:not(.active),
+        .actions,
+        .btn,
+        .hide-mobile,
+        .section:not(.active) {
+          display: none !important;
+        }
+
+        .main {
+          padding: 0;
+        }
+
+        .section.active {
+          display: block !important;
+        }
+
+        .invoice-preview {
+          box-shadow: none;
+          border: none;
+          padding: 0;
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">NS</div>
+          <h1>Notas &amp; Serviços</h1>
+        </div>
+
+        <nav class="nav">
+          <button class="active" data-target="empresa">Perfil da Empresa</button>
+          <button data-target="clientes">Clientes</button>
+          <button data-target="itens">Produtos e Serviços</button>
+          <button data-target="notas">Nova Nota</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <section id="empresa" class="section active">
+          <div class="header-card">
+            <h2>Perfil da Empresa</h2>
+            <p>Configure os dados da sua empresa e deixe a nota profissional e pronta para impressão.</p>
+          </div>
+
+          <div class="card">
+            <h3>Dados da empresa</h3>
+            <div class="form-grid">
+              <label class="full">
+                Nome da empresa
+                <input id="companyName" type="text" placeholder="Nome da empresa" />
+              </label>
+
+              <label>
+                CNPJ
+                <input id="companyCnpj" type="text" placeholder="00.000.000/0000-00" />
+              </label>
+
+              <label>
+                Inscrição Municipal
+                <input id="companyIm" type="text" placeholder="Opcional" />
+              </label>
+
+              <label>
+                Telefone
+                <input id="companyPhone" type="text" placeholder="(00) 00000-0000" />
+              </label>
+
+              <label>
+                E-mail
+                <input id="companyEmail" type="email" placeholder="contato@empresa.com" />
+              </label>
+
+              <label>
+                ISS (%)
+                <input id="companyIss" type="number" min="0" step="0.01" placeholder="5" />
+              </label>
+
+              <label class="full">
+                Endereço
+                <input id="companyAddress" type="text" placeholder="Rua ..., nº ..., bairro, cidade - UF, CEP" />
+              </label>
+
+              <label class="full">
+                Logo da empresa
+                <input id="companyLogo" type="file" accept="image/*" />
+              </label>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="saveCompanyBtn">Salvar perfil</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="clientes" class="section">
+          <div class="header-card">
+            <h2>Clientes</h2>
+            <p>Cadastre os clientes para compor o histórico da sua rotina e gerar notas com rapidez.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Novo cliente</h3>
+              <div class="form-grid">
+                <label>
+                  Nome
+                  <input id="clientName" type="text" placeholder="Nome completo" />
+                </label>
+
+                <label>
+                  Documento
+                  <input id="clientDocument" type="text" placeholder="CPF ou CNPJ" />
+                </label>
+
+                <label>
+                  Telefone
+                  <input id="clientPhone" type="text" placeholder="(00) 00000-0000" />
+                </label>
+
+                <label>
+                  E-mail
+                  <input id="clientEmail" type="email" placeholder="cliente@email.com" />
+                </label>
+
+                <label class="full">
+                  Endereço
+                  <input id="clientAddress" type="text" placeholder="Rua, bairro, cidade - UF" />
+                </label>
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" id="saveClientBtn">Cadastrar cliente</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Clientes cadastrados</h3>
+              <div id="clientList" class="list-box"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="itens" class="section">
+          <div class="header-card">
+            <h2>Produtos e Serviços</h2>
+            <p>Cadastre itens para incluir em qualquer nota de serviço. Produtos e serviços podem aparecer juntos na mesma nota.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3>Novo item</h3>
+              <div class="form-grid">
+                <label>
+                  Tipo
+                  <select id="itemType">
+                    <option value="service">Serviço</option>
+                    <option value="product">Produto</option>
+                  </select>
+                </label>
+
+                <label>
+                  Nome
+                  <input id="itemName" type="text" placeholder="Nome do item" />
+                </label>
+
+                <label class="full">
+                  Descrição
+                  <textarea id="itemDescription" placeholder="Descreva o serviço ou produto"></textarea>
+                </label>
+
+                <label>
+                  Preço unitário
+                  <input id="itemPrice" type="number" min="0" step="0.01" placeholder="0,00" />
+                </label>
+
+                <label>
+                  Unidade
+                  <input id="itemUnit" type="text" placeholder="UN / H / MÊS" />
+                </label>
+              </div>
+
+              <div class="actions">
+                <button class="btn primary" id="saveItemBtn">Salvar item</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Itens cadastrados</h3>
+              <div id="itemList" class="list-box"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="notas" class="section">
+          <div class="header-card">
+            <h2>Emissão de Nota</h2>
+            <p>Selecione o cliente, adicione itens e emita a nota para impressão em PDF.</p>
+          </div>
+
+          <div class="card invoice-builder">
+            <div class="invoice-toolbar">
+              <label>
+                Cliente
+                <select id="invoiceClientSelect"></select>
+              </label>
+
+              <label>
+                Número da nota
+                <input id="invoiceNumber" type="text" placeholder="NS-0001" />
+              </label>
+
+              <label>
+                Data de emissão
+                <input id="invoiceDate" type="date" />
+              </label>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="addItemToInvoiceBtn">Adicionar item</button>
+            </div>
+
+            <div id="invoiceItemRows"></div>
+
+            <div class="invoice-total">
+              <div class="total-line">
+                <span>Subtotal</span>
+                <span id="subtotalValue">R$ 0,00</span>
+              </div>
+              <div class="total-line">
+                <span>ISS</span>
+                <span id="issValue">R$ 0,00</span>
+              </div>
+              <div class="total-line">
+                <strong>Total</strong>
+                <strong id="totalValue">R$ 0,00</strong>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" id="previewInvoiceBtn">Atualizar visualização</button>
+              <button class="btn secondary" id="printInvoiceBtn">Imprimir / Salvar em PDF</button>
+            </div>
+          </div>
+
+          <div id="invoicePreview" class="invoice-preview"></div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const STORAGE_KEYS = {
+        company: 'nota_empresa',
+        clients: 'nota_clientes',
+        items: 'nota_itens',
+        invoice: 'nota_draft',
+        invoiceCounter: 'nota_counter'
+      };
+
+      const defaultCompany = {
+        nome: 'Nome da Empresa Ltda',
+        cnpj: '00.000.000/0000-00',
+        im: '',
+        telefone: '(00) 00000-0000',
+        email: 'contato@empresa.com',
+        endereco: 'Rua Exemplo, 123, Centro, Cidade - UF, CEP 00000-000',
+        iss: 5,
+        logo: ''
+      };
+
+      const state = {
+        company: loadJson(STORAGE_KEYS.company, defaultCompany),
+        clients: loadJson(STORAGE_KEYS.clients, []),
+        items: loadJson(STORAGE_KEYS.items, []),
+        invoice: loadJson(STORAGE_KEYS.invoice, {
+          clientId: '',
+          number: 'NS-0001',
+          date: todayISO(),
+          rows: []
+        })
+      };
+
+      const els = {
+        companyName: document.getElementById('companyName'),
+        companyCnpj: document.getElementById('companyCnpj'),
+        companyIm: document.getElementById('companyIm'),
+        companyPhone: document.getElementById('companyPhone'),
+        companyEmail: document.getElementById('companyEmail'),
+        companyIss: document.getElementById('companyIss'),
+        companyAddress: document.getElementById('companyAddress'),
+        companyLogo: document.getElementById('companyLogo'),
+        saveCompanyBtn: document.getElementById('saveCompanyBtn'),
+        clientName: document.getElementById('clientName'),
+        clientDocument: document.getElementById('clientDocument'),
+        clientPhone: document.getElementById('clientPhone'),
+        clientEmail: document.getElementById('clientEmail'),
+        clientAddress: document.getElementById('clientAddress'),
+        saveClientBtn: document.getElementById('saveClientBtn'),
+        clientList: document.getElementById('clientList'),
+        itemType: document.getElementById('itemType'),
+        itemName: document.getElementById('itemName'),
+        itemDescription: document.getElementById('itemDescription'),
+        itemPrice: document.getElementById('itemPrice'),
+        itemUnit: document.getElementById('itemUnit'),
+        saveItemBtn: document.getElementById('saveItemBtn'),
+        itemList: document.getElementById('itemList'),
+        invoiceClientSelect: document.getElementById('invoiceClientSelect'),
+        invoiceNumber: document.getElementById('invoiceNumber'),
+        invoiceDate: document.getElementById('invoiceDate'),
+        addItemToInvoiceBtn: document.getElementById('addItemToInvoiceBtn'),
+        invoiceItemRows: document.getElementById('invoiceItemRows'),
+        subtotalValue: document.getElementById('subtotalValue'),
+        issValue: document.getElementById('issValue'),
+        totalValue: document.getElementById('totalValue'),
+        previewInvoiceBtn: document.getElementById('previewInvoiceBtn'),
+        printInvoiceBtn: document.getElementById('printInvoiceBtn'),
+        invoicePreview: document.getElementById('invoicePreview')
+      };
+
+      const navButtons = document.querySelectorAll('.nav button');
+      navButtons.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          navButtons.forEach((item) => item.classList.remove('active'));
+          btn.classList.add('active');
+          document.querySelectorAll('.section').forEach((section) => {
+            section.classList.toggle('active', section.id === btn.dataset.target);
+          });
+        });
+      });
+
+      function loadJson(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function saveJson(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function todayISO() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+      }
+
+      function setCompanyFields() {
+        els.companyName.value = state.company.nome || '';
+        els.companyCnpj.value = state.company.cnpj || '';
+        els.companyIm.value = state.company.im || '';
+        els.companyPhone.value = state.company.telefone || '';
+        els.companyEmail.value = state.company.email || '';
+        els.companyIss.value = state.company.iss ?? 5;
+        els.companyAddress.value = state.company.endereco || '';
+      }
+
+      function renderClientList() {
+        if (!state.clients.length) {
+          els.clientList.innerHTML = '<div class="empty-state">Nenhum cliente cadastrado.</div>';
+          return;
+        }
+
+        els.clientList.innerHTML = state.clients.map((client) => `
+          <div class="list-item">
+            <div>
+              <strong>${escapeHtml(client.nome)}</strong>
+              <small>${escapeHtml(client.document || 'Sem documento')} • ${escapeHtml(client.email || 'Sem e-mail')}</small>
+            </div>
+            <span class="pill">${client.document ? 'Cliente' : 'Pessoa'}</span>
+          </div>
+        `).join('');
+      }
+
+      function renderItemList() {
+        if (!state.items.length) {
+          els.itemList.innerHTML = '<div class="empty-state">Nenhum produto ou serviço cadastrado.</div>';
+          return;
+        }
+
+        els.itemList.innerHTML = state.items.map((item) => `
+          <div class="list-item">
+            <div>
+              <strong>${escapeHtml(item.nome)}</strong>
+              <small>${item.tipo === 'service' ? 'Serviço' : 'Produto'} • ${escapeHtml(item.unidade || 'UN')} • ${formatCurrency(item.preco)}</small>
+            </div>
+            <span class="pill">${item.tipo === 'service' ? 'Serv.' : 'Prod.'}</span>
+          </div>
+        `).join('');
+      }
+
+      function renderInvoiceClientOptions() {
+        const options = state.clients.length ? state.clients.map((client) => `
+          <option value="${client.id}">${escapeHtml(client.nome)}</option>
+        `).join('') : '<option value="">Nenhum cliente cadastrado</option>';
+
+        els.invoiceClientSelect.innerHTML = options;
+
+        const saved = state.invoice.clientId;
+        if (saved && state.clients.some((client) => client.id === saved)) {
+          els.invoiceClientSelect.value = String(saved);
+        } else if (state.clients.length) {
+          state.invoice.clientId = state.clients[0].id;
+          els.invoiceClientSelect.value = String(state.clients[0].id);
+          saveJson(STORAGE_KEYS.invoice, state.invoice);
+        }
+      }
+
+      function renderInvoiceRows() {
+        if (!state.invoice.rows.length) {
+          els.invoiceItemRows.innerHTML = '<div class="empty-state">Nenhum item adicionado à nota.</div>';
+          updateTotals();
+          return;
+        }
+
+        els.invoiceItemRows.innerHTML = state.invoice.rows.map((row, index) => {
+          const itemOptions = state.items.map((item) => `
+            <option value="${item.id}" ${row.itemId === item.id ? 'selected' : ''}>${escapeHtml(item.nome)} (${item.tipo === 'service' ? 'Serviço' : 'Produto'})</option>
+          `).join('');
+
+          return `
+            <div class="item-row">
+              <label>
+                Item
+                <select data-field="itemId" data-index="${index}">${itemOptions || '<option value="">Cadastre um item</option>'}</select>
+              </label>
+
+              <label>
+                Quantidade
+                <input type="number" min="1" step="1" value="${row.quantidade || 1}" data-field="quantidade" data-index="${index}" />
+              </label>
+
+              <label>
+                Valor unit.
+                <input type="number" min="0" step="0.01" value="${(row.precoUnitario || 0).toFixed(2)}" data-field="precoUnitario" data-index="${index}" />
+              </label>
+
+              <label>
+                Total
+                <input type="text" value="${formatCurrency(row.total || 0)}" readonly />
+              </label>
+
+              <button class="tiny-btn remove" data-remove-index="${index}">Excluir</button>
+            </div>
+          `;
+        }).join('');
+
+        updateTotals();
+      }
+
+      function updateTotals() {
+        const subtotal = state.invoice.rows.reduce((sum, row) => sum + Number((row.total || 0)), 0);
+        const issPercent = Number(state.company.iss || 0);
+        const issValue = subtotal * (issPercent / 100);
+        const total = subtotal + issValue;
+
+        els.subtotalValue.textContent = formatCurrency(subtotal);
+        els.issValue.textContent = formatCurrency(issValue);
+        els.totalValue.textContent = formatCurrency(total);
+      }
+
+      function getInvoiceClient() {
+        return state.clients.find((client) => client.id === Number(state.invoice.clientId)) || null;
+      }
+
+      function buildInvoiceHtml() {
+        const company = state.company;
+        const client = getInvoiceClient();
+        const invoiceNumber = state.invoice.number || 'NS-0001';
+        const issueDate = state.invoice.date ? new Date(state.invoice.date + 'T12:00:00') : new Date();
+        const subtotal = state.invoice.rows.reduce((sum, row) => sum + Number(row.total || 0), 0);
+        const issPercent = Number(company.iss || 0);
+        const issValue = subtotal * (issPercent / 100);
+        const total = subtotal + issValue;
+
+        const rowsHtml = state.invoice.rows.map((row) => {
+          const item = state.items.find((value) => value.id === row.itemId);
+          const desc = item ? item.nome : 'Item';
+          const tipo = item ? (item.tipo === 'service' ? 'Serviço' : 'Produto') : 'Item';
+          return `
+            <tr>
+              <td>${tipo}</td>
+              <td>${escapeHtml(desc)}</td>
+              <td>${Number(row.quantidade || 1)}</td>
+              <td class="amount">${formatCurrency(Number(row.precoUnitario || 0))}</td>
+              <td class="amount">${formatCurrency(Number(row.total || 0))}</td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="5">Nenhum item adicionado.</td></tr>';
+
+        const logoHtml = company.logo ? `<img src="${company.logo}" class="company-logo" alt="Logo da empresa" />` : `<div class="company-logo" style="display:grid;place-items:center;background:#ecf2ff;color:${'var(--primary)'};font-weight:700;">Logo</div>`;
+
+        return `
+          <div class="invoice-header">
+            <div class="company-block">
+              ${logoHtml}
+              <div>
+                <h2>${escapeHtml(company.nome || 'Nome da Empresa')}</h2>
+                <p><strong>CNPJ:</strong> ${escapeHtml(company.cnpj || '00.000.000/0000-00')}</p>
+                <p><strong>Inscrição Municipal:</strong> ${escapeHtml(company.im || 'Não informado')}</p>
+                <p>${escapeHtml(company.endereco || 'Endereço não informado')}</p>
+                <p>${escapeHtml(company.email || '')} • ${escapeHtml(company.telefone || '')}</p>
+              </div>
+            </div>
+
+            <div class="invoice-meta">
+              <h3>Nota de Serviço</h3>
+              <p><strong>Número:</strong> ${escapeHtml(invoiceNumber)}</p>
+              <p><strong>Data:</strong> ${issueDate.toLocaleDateString('pt-BR')}</p>
+              <p><strong>ISS:</strong> ${company.iss || 0}%</p>
+            </div>
+          </div>
+
+          <div class="invoice-body">
+            <div class="invoice-box">
+              <h4>Dados do cliente</h4>
+              <p><strong>Nome:</strong> ${escapeHtml(client ? client.nome : 'Cliente não selecionado')}</p>
+              <p><strong>Documento:</strong> ${escapeHtml(client ? client.document : '---')}</p>
+              <p><strong>Telefone:</strong> ${escapeHtml(client ? client.telefone || client.phone || '---' : '---')}</p>
+              <p><strong>E-mail:</strong> ${escapeHtml(client ? client.email || '---' : '---')}</p>
+              <p><strong>Endereço:</strong> ${escapeHtml(client ? client.endereco || '---' : '---')}</p>
+            </div>
+
+            <div class="invoice-box">
+              <h4>Resumo</h4>
+              <p><strong>Tipo:</strong> Serviço / Produto</p>
+              <p><strong>Observações:</strong> Nota emitida em ambiente de demonstração.</p>
+              <p><strong>Condição:</strong> À vista</p>
+            </div>
+          </div>
+
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Descrição</th>
+                <th>Qtd</th>
+                <th class="amount">Valor unit.</th>
+                <th class="amount">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <div class="invoice-summary">
+            <div class="summary-card">
+              <div class="total-line"><span>Subtotal</span><span>${formatCurrency(subtotal)}</span></div>
+              <div class="total-line"><span>ISS</span><span>${formatCurrency(issValue)}</span></div>
+              <div class="total-line"><strong>Total</strong><strong>${formatCurrency(total)}</strong></div>
+            </div>
+          </div>
+
+          <div class="invoice-footer">
+            <p>Observações: A emissão desta nota confirma a prestação de serviços ou entrega de produtos conforme os itens listados acima.</p>
+            <p>Assinatura e carimbo da empresa</p>
+          </div>
+        `;
+      }
+
+      function renderPreview() {
+        els.invoicePreview.innerHTML = buildInvoiceHtml();
+      }
+
+      function updateDraftFromInputs() {
+        const selectedClient = els.invoiceClientSelect.value;
+        state.invoice.clientId = selectedClient || '';
+        state.invoice.number = els.invoiceNumber.value || 'NS-0001';
+        state.invoice.date = els.invoiceDate.value || todayISO();
+        saveJson(STORAGE_KEYS.invoice, state.invoice);
+      }
+
+      function addInvoiceRow() {
+        state.invoice.rows.push({
+          itemId: state.items[0]?.id || '',
+          quantidade: 1,
+          precoUnitario: state.items[0]?.preco || 0,
+          total: state.items[0]?.preco || 0
+        });
+        saveJson(STORAGE_KEYS.invoice, state.invoice);
+        renderInvoiceRows();
+      }
+
+      function updateRowFromInputs() {
+        const rows = [...document.querySelectorAll('.item-row')];
+        rows.forEach((row) => {
+          const index = Number(row.querySelector('[data-index]').dataset.index);
+          const itemSelect = row.querySelector('[data-field="itemId"]');
+          const quantityInput = row.querySelector('[data-field="quantidade"]');
+          const priceInput = row.querySelector('[data-field="precoUnitario"]');
+          const item = state.items.find((value) => String(value.id) === String(itemSelect.value));
+
+          if (!state.invoice.rows[index]) return;
+
+          state.invoice.rows[index].itemId = item ? item.id : '';
+          state.invoice.rows[index].quantidade = Number(quantityInput.value || 1);
+          state.invoice.rows[index].precoUnitario = Number(priceInput.value || item?.preco || 0);
+          state.invoice.rows[index].total = state.invoice.rows[index].quantidade * state.invoice.rows[index].precoUnitario;
+        });
+
+        saveJson(STORAGE_KEYS.invoice, state.invoice);
+        renderInvoiceRows();
+        updatePreviewOnly();
+      }
+
+      function updatePreviewOnly() {
+        renderPreview();
+        updateTotals();
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function onSaveCompany() {
+        const company = {
+          nome: els.companyName.value.trim() || defaultCompany.nome,
+          cnpj: els.companyCnpj.value.trim() || defaultCompany.cnpj,
+          im: els.companyIm.value.trim(),
+          telefone: els.companyPhone.value.trim() || defaultCompany.telefone,
+          email: els.companyEmail.value.trim() || defaultCompany.email,
+          iss: Number(els.companyIss.value || 0),
+          endereco: els.companyAddress.value.trim() || defaultCompany.endereco,
+          logo: state.company.logo || ''
+        };
+
+        const file = els.companyLogo.files && els.companyLogo.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            company.logo = event.target.result;
+            state.company = company;
+            saveJson(STORAGE_KEYS.company, state.company);
+            renderPreview();
+          };
+          reader.readAsDataURL(file);
+        } else {
+          state.company = company;
+          saveJson(STORAGE_KEYS.company, state.company);
+          renderPreview();
+        }
+      }
+
+      function onSaveClient() {
+        const nome = els.clientName.value.trim();
+        const document = els.clientDocument.value.trim();
+        const phone = els.clientPhone.value.trim();
+        const email = els.clientEmail.value.trim();
+        const endereco = els.clientAddress.value.trim();
+
+        if (!nome) {
+          alert('Preencha o nome do cliente.');
+          return;
+        }
+
+        const newClient = {
+          id: Date.now(),
+          nome,
+          document,
+          telefone: phone,
+          email,
+          endereco
+        };
+
+        state.clients.push(newClient);
+        saveJson(STORAGE_KEYS.clients, state.clients);
+        renderClientList();
+        renderInvoiceClientOptions();
+        clearClientForm();
+      }
+
+      function clearClientForm() {
+        els.clientName.value = '';
+        els.clientDocument.value = '';
+        els.clientPhone.value = '';
+        els.clientEmail.value = '';
+        els.clientAddress.value = '';
+      }
+
+      function onSaveItem() {
+        const nome = els.itemName.value.trim();
+        const descricao = els.itemDescription.value.trim();
+        const preco = Number(els.itemPrice.value || 0);
+        const tipo = els.itemType.value;
+        const unidade = els.itemUnit.value.trim() || 'UN';
+
+        if (!nome || preco <= 0) {
+          alert('Preencha o nome e o preço do item.');
+          return;
+        }
+
+        const newItem = {
+          id: Date.now(),
+          nome,
+          descricao,
+          tipo,
+          preco,
+          unidade,
+          createdAt: new Date().toISOString()
+        };
+
+        state.items.push(newItem);
+        saveJson(STORAGE_KEYS.items, state.items);
+        renderItemList();
+        renderInvoiceRows();
+        clearItemForm();
+      }
+
+      function clearItemForm() {
+        els.itemName.value = '';
+        els.itemDescription.value = '';
+        els.itemPrice.value = '';
+        els.itemUnit.value = '';
+      }
+
+      els.saveCompanyBtn.addEventListener('click', onSaveCompany);
+      els.saveClientBtn.addEventListener('click', onSaveClient);
+      els.saveItemBtn.addEventListener('click', onSaveItem);
+      els.previewInvoiceBtn.addEventListener('click', () => {
+        updateDraftFromInputs();
+        renderPreview();
+      });
+
+      els.printInvoiceBtn.addEventListener('click', () => {
+        updateDraftFromInputs();
+        renderPreview();
+        window.print();
+      });
+
+      els.addItemToInvoiceBtn.addEventListener('click', () => {
+        updateDraftFromInputs();
+        addInvoiceRow();
+        renderInvoiceRows();
+        renderPreview();
+      });
+
+      document.addEventListener('input', (event) => {
+        if (event.target.matches('[data-field]')) {
+          updateRowFromInputs();
+        }
+      });
+
+      document.addEventListener('change', (event) => {
+        if (event.target.matches('[data-field]')) {
+          updateRowFromInputs();
+        }
+      });
+
+      document.addEventListener('click', (event) => {
+        const removeBtn = event.target.closest('[data-remove-index]');
+        if (removeBtn) {
+          const index = Number(removeBtn.dataset.removeIndex);
+          state.invoice.rows.splice(index, 1);
+          saveJson(STORAGE_KEYS.invoice, state.invoice);
+          renderInvoiceRows();
+          renderPreview();
+        }
+      });
+
+      els.invoiceClientSelect.addEventListener('change', () => {
+        updateDraftFromInputs();
+        renderPreview();
+      });
+
+      els.invoiceNumber.addEventListener('input', () => {
+        updateDraftFromInputs();
+        renderPreview();
+      });
+
+      els.invoiceDate.addEventListener('change', () => {
+        updateDraftFromInputs();
+        renderPreview();
+      });
+
+      setCompanyFields();
+      renderClientList();
+      renderItemList();
+      renderInvoiceClientOptions();
+      els.invoiceNumber.value = state.invoice.number || 'NS-0001';
+      els.invoiceDate.value = state.invoice.date || todayISO();
+      renderInvoiceRows();
+      renderPreview();
+    </script>
+  </body>
 </html>
